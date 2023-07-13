@@ -4,7 +4,8 @@ const categoryController = {
     //get all categories
     getAllCategories: async (req, res) => {
         try {
-            const categories = await Category.find();
+            const categories = await Category.find()
+                .populate('products');
             res.json(categories);
         } catch (err) {
             res.status(500).json({ message: 'Internal server error' });
@@ -43,25 +44,13 @@ const categoryController = {
     //update a category
     updateCategory: async (req, res) => {
         try {
-            const category = await Category.findById(req.params.id);
-            category.categoryName = req.body.categoryName;
-            category.products = req.body.products;
-            await category.save();
+            const id = req.params.id;
+            const category = await Category.findByIdAndUpdate(id, req.body, { new: true });
             res.json(category);
         } catch (err) {
             res.status(500).json({ message: "internal server error" });
         }
     }
-    //get all products under a category
-    //getProductsByCategory: async (req, res) => {
-    //    try {
-    //        const category = await Category.findById(req.params.id);
-    //        const products = category.products;
-    //        res.json(products);
-    //    } catch (err) {
-    //        res.status(500).json({ message: "internal server error" });
-    //    }
-    //}
 }
 
 module.exports = categoryController;

@@ -1,64 +1,85 @@
 const Product = require('../models/productModel');
+const Category = require('../models/categoryModel');
 
-const productController = {
-    //get all products
-    getAllProducts: async (req, res) => {
-        try {
-            const products = await Product.find();
-            res.json(products);
-        } catch (err) {
-            res.status(500).json({ message: 'Internal server error' });
+module.exports.getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find();
+        //populate category id with category name
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+module.exports.getOneProduct = async(req, res) => {
+    try{
+        const product = await Product.findById(req.params.id);
+        if(product){
+            res.json(product);
+        }else{
+            res.status(404).json({message: "Product not found"});
         }
-    },
-    //create a new product
-    createProduct: async (req, res) => {
+    }catch(err){
+        res.status(500).json({message: "Internal server error"});
+    }
+}
+module.exports.createProduct = async(req,res) =>{
+    try{
         const product = new Product({
             productName: req.body.productName,
             productDescription: req.body.productDescription,
             productPrice: req.body.productPrice,
             productCategory: req.body.productCategory
         });
-        try {
-            const newProduct = await product.save();
-            res.status(201).json(newProduct);
-        } catch (err) {
-            res.status(400).json({ message: "Error creating product" });
-        }
-    },
-    //get a product by id
-    getProductById: async (req, res) => {
-        try {
-            const product = await Product.findById(req.params.id);
-            res.json(product);
-        } catch (err) {
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    }
-    ,
-    //delete a product
-    deleteProduct: async (req, res) => {
-        try {
-            const product = await Product.findByIdAndDelete(req.params.id);
-            res.json({ message: "Product deleted" });
-        } catch (err) {
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    }
-    ,
-    //update a product
-    updateProduct: async (req, res) => {
-        try {
-            const product = await Product.findById(req.params.id);
-            product.productName = req.body.productName;
-            product.productDescription = req.body.productDescription;
-            product.productPrice = req.body.productPrice;
-            product.productCategory = req.body.productCategory;
-            await product.save();
-            res.json(product);
-        } catch (err) {
-            res.status(500).json({ message: 'Internal server error' });
-        }
+        const newProduct = await product.save();
+        const createdProduct = await Category.findOneAndUpdate(
+            {_id: req.body.productCategory},
+            {$push: {products: newProduct._id}},
+            {new: true}
+        )
+        res.status(200).json(newProduct);
+    }catch(err){
+        res.status(400).json(err);
     }
 }
 
-module.exports = productController;
+module.exports.deleteProduct = async(req, res) => {
+    try{
+        const productId = req.params.id;
+        const categoryId = req.body.productCategory;
+        await Category.findOneAndUpdate(
+            {_id: categoryId},
+            {$pull: {products: productId}},
+            {new: true}
+        );
+    
+        const product = await Product.findByIdAndDelete(productId);
+        if(!product){
+            res.status(404).json({message: "Product not found"});
+        }else{
+            res.send("Document deleted");
+        }
+    }catch(err){
+        res.status(500).json(err);
+    }
+}
+
+module.exports.updateProduct = async(req, res) => {
+   try{
+    const updateProduct = await Product.updateOne(
+    {
+        _id: req.params.id
+    },
+    {
+    $set: 
+    {
+        productName: req.body.productName,
+        productDescription: req.body.productDescription,
+        productPrice: req.body.productPrice,
+        productCategory: req.body.productCategory
+    }
+    });
+    res.status(200).json(updateProduct);
+    }catch(err){
+        res.status(500).json(err);
+   }
+}
