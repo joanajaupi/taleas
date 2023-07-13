@@ -21,9 +21,7 @@ const categoryController = {
     },
     createCategory: async (req, res) => {
         const category = new Category({
-            categoryName: req.body.categoryName,
-            products: req.body.products
-
+            categoryName: req.body.categoryName
         });
         try {
             const newCategory = await category.save();
