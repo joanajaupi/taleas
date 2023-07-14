@@ -4,7 +4,6 @@ const Category = require('../models/categoryModel');
 module.exports.getAllProducts = async (req, res) => {
     try {
         const products = await Product.find();
-        //populate category id with category name
         res.json(products);
     } catch (err) {
         res.status(500).json({ message: 'Internal server error' });
@@ -46,10 +45,14 @@ module.exports.deleteProduct = async(req, res) => {
     try{
         const productId = req.params.id;
         const categoryId = req.body.productCategory;
-        await Category.findOneAndUpdate(
-            {_id: categoryId},
-            {$pull: {products: productId}},
-            {new: true}
+        //remove the id of the product from the list of products under this category
+        const updatedCategory = await Category.findOneAndUpdate(
+            {
+                _id: categoryId
+            },
+            {
+                $pull: {products: productId}
+            }
         );
     
         const product = await Product.findByIdAndDelete(productId);

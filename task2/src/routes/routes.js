@@ -14,5 +14,5 @@ app.get('/products', productController.getAllProducts);
 app.post('/products', productController.createProduct);
 app.delete('/products/:id', productController.deleteProduct);
 app.put('/products/:id', productController.updateProduct);
-//app.get('/products/:id', productController.getOneProduct);
+app.get('/products/:id', productController.getOneProduct);
 module.exports = app;
