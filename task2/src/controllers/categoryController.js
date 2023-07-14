@@ -14,7 +14,7 @@ module.exports.getAllCategories = async(req, res) =>{
 module.exports.getCategoryById = async(req, res) =>{
     try{
         const categoryId = req.params.id;
-        const category = await Category.findById(categoryId);
+        const category = await Category.findById(categoryId).populate('products').exec();
         if(category){
             res.json(category);
         }else{
