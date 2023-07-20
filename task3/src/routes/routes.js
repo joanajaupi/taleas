@@ -4,7 +4,7 @@ const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
 const orderController = require('../controllers/orderController');
 const customerController = require('../controllers/customerController');
-
+const expressValidator = require('express-validator');
 app.use(express.json());
 
 app.get('/categories', categoryController.getAllCategories);
@@ -27,9 +27,9 @@ app.put('/orders/:id/addProduct', orderController.addProductToOrder);
 app.put('/orders/:id/removeProduct', orderController.removeProductFromOrder);
 
 app.get('/customers', customerController.getAllCustomers);
-app.post('/customers', customerController.createCustomer);
+app.post('/customers', customerController.validate('createCustomer'), customerController.createCustomer);
 app.get('/customers/:id', customerController.getCustomerById);
-app.delete('/customers/:id', customerController.deleteCustomer);
-app.put('/customers/:id', customerController.updateCustomer);
+app.delete('/customers/:id', customerController.softDeleteCustomer);
+app.put('/customers/:id', customerController.validate('updateCustomer'),customerController.updateCustomer);
 
 module.exports = app;

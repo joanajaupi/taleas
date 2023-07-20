@@ -1,0 +1,78 @@
+{
+    "swagger": "2.0",
+    "info":{
+        "description": "API documantation for the project",
+        "version": "1.0.0",
+        "title": "API documantation for the project",
+        "contact": {
+            "email": "jjaupi20@epoka.edu.al"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "schemes":["http"],
+    "host": "localhost:3000",
+    "basePath":"/",
+    "paths":{
+        "/categories":{
+            "get":{
+                "summary": "Returns all categories",
+                "tags": ["Categories"],
+                "produces":["application/json"],
+                "parameters":[],
+                "responses": {
+                    "200": {
+                        "description": "A list of categories.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Category"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "categoryName": {
+                    "type": "string"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/product"
+                    }
+                }
+            }
+        },
+        "product":{
+            "type": "object",
+            "properties":{
+                "id":{
+                    "type": "integer"
+                },
+                "productName":{
+                    "type": "string"
+                },
+                "productDescription":{
+                    "type": "string"
+                },
+                "productPrice":{
+                    "type": "integer"
+                },
+                "productCategory":{
+                    "$ref": "#/definitions/Category"
+                }
+            }
+        }
+    }
+}

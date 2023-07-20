@@ -3,7 +3,7 @@ const customerModel = require('../models/customerModel');
 const productModel = require('../models/productModel');
 module.exports.getAllOrders = async(req, res) =>{
     try{
-        const orders = await orderModel.find().populate('orderCustomer', 'customerName').populate('orderProducts', 'productName').exec();
+        const orders = await orderModel.find().populate('orderCustomer').populate('orderProducts').exec();
         res.json(orders);
     }catch(err){
         res.status(500).json({message: "Internal server error"});
@@ -12,7 +12,7 @@ module.exports.getAllOrders = async(req, res) =>{
 
 module.exports.getOrderById = async(req, res) =>{
     try{
-        const order = await orderModel.findById(req.params.id).populate('orderCustomer', 'customerName').populate('orderProducts', 'productName').exec();
+        const order = await orderModel.findById(req.params.id).populate('orderCustomer').populate('orderProducts').exec();
         if(order){
             res.json(order);
         }else{
@@ -32,6 +32,8 @@ module.exports.createOrder = async(req, res) =>{
         const order = new orderModel({
             //order date when the order was placed, moment of making request
             orderDate: Date.now(),
+            //status is a string, can be one of the following: "pending", "processing", "completed", "cancelled"
+            orderStatus: req.body.status,
             orderCustomer: req.body.customer,
             orderProducts: products
         });
@@ -45,7 +47,7 @@ module.exports.createOrder = async(req, res) =>{
 
 module.exports.updateOrder = async(req, res) =>{
     try{
-        const updatedOrder =await orderModel.updateOne(
+        const updatedOrder = orderModel.updateOne(
             {
                 _id: req.params.id
             },
@@ -75,25 +77,14 @@ module.exports.addProductToOrder = async(req, res) =>{
     try{
         const order = await orderModel.findById(req.params.id);
         if(order){
-            //check if the added product is already in the order
-            if(order.orderProducts.includes(req.body.products)){
-                res.status(400).json({message: "Product already in the order"});
-                return;
-            }
-            //check if the added product is in the database
-            if((await productModel.findById(req.body.products)) == null){
-                res.status(404).json({message: "Product not found"});
-                return;
-            }
             order.orderProducts.push(req.body.products);
             await order.save();
-            res.status(200).json(order);
+            res.status(201).json(order);
         }else{
             res.status(404).json({message: "Order not found"});
         }
     }catch(err){
-        res.status(500).json(err);
-        console.log(err)
+        res.status(500).json({message: "Internal server error"});
     }
 }
 

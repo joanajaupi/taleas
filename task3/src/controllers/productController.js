@@ -46,14 +46,7 @@ module.exports.deleteProduct = async(req, res) => {
         const productId = req.params.id;
         const categoryId = req.body.productCategory;
         //remove the id of the product from the list of products under this category
-        const updatedCategory = await Category.findOneAndUpdate(
-            {
-                _id: categoryId
-            },
-            {
-                $pull: {products: productId}
-            }
-        );
+       
     
         const product = await Product.findByIdAndDelete(productId);
         if(!product){

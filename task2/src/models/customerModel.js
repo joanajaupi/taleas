@@ -11,8 +11,7 @@ const customerSchema = new mongoose.Schema({
     },
     customerPhone: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     customerPassword: {
         type: String,
@@ -21,11 +20,7 @@ const customerSchema = new mongoose.Schema({
     orders: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order'
-    }],
-    isDeleted: {
-        type: Boolean,
-        default: false
-    }
+    }]
 });
 
 module.exports = mongoose.model('Customer', customerSchema);

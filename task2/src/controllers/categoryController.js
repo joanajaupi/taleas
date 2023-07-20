@@ -4,7 +4,7 @@ module.exports.getAllCategories = async(req, res) =>{
 
     try{
         const categories = await Category.find().populate('products').exec();
-        res.json(categories);
+        res.status(200).json(categories);
     }catch(err){
         res.status(500).json({message:"internal server error"});
     }
@@ -61,7 +61,7 @@ module.exports.deleteCategory = async(req,res) =>{
         if(!deletedCategory){
             res.status(404).json({message:"Category not found"});
         }else{
-            res.send("Document deleted");
+            res.status(200).send("Document deleted");
         }
 
     }catch(err){

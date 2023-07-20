@@ -1,9 +1,10 @@
+const { default: mongoose } = require('mongoose');
 const Category = require('../models/categoryModel');
 
 module.exports.getAllCategories = async(req, res) =>{
 
     try{
-        const categories = await Category.find().populate('products').exec();
+        const categories = await Category.find().populate('products',['productName', 'productPrice']).exec();
         res.json(categories);
     }catch(err){
         res.status(500).json({message:"internal server error"});
@@ -14,7 +15,11 @@ module.exports.getAllCategories = async(req, res) =>{
 module.exports.getCategoryById = async(req, res) =>{
     try{
         const categoryId = req.params.id;
-        const category = await Category.findById(categoryId).populate('products').exec();
+        if(!mongoose.Types.ObjectId.isValid(categoryId)){
+            res.status(400).json({message: "Invalid category id"});
+            return;
+        }
+        const category = await Category.findById(categoryId).populate('products', ['productName', 'productPrice']).exec();
         if(category){
             res.json(category);
         }else{
